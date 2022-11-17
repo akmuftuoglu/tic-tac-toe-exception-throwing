@@ -2,7 +2,7 @@
 PIC 10C Homework 6, myttt.cpp
 Purpose: Throwing expections for Tic-Tac-Toe
 Author: Aral Muftuoglu
-Date: 11/07/2022
+Date: 11/17/2022
 */
 
 #include <iostream>
