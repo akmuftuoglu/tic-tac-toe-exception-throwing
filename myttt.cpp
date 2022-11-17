@@ -8,6 +8,7 @@ Date: 11/07/2022
 #include <iostream>
 #include <vector>
 #include <string>
+#include <stdlib.h>
 using namespace std;
 
 char square[10] = {'o','1','2','3','4','5','6','7','8','9'};
@@ -52,6 +53,8 @@ int main()
             cout << errorMessage << endl;
         }
     }
+    
+    // after game is chosen:
     
     if (gameType == "1")
     {
@@ -162,11 +165,11 @@ int checkwin()
 void print_board(int gameType)
 {
     cout << "\n \t Tic Tac Toe \n";
-    if (gameType == 1)
+    if (gameType == 1)  // single player game
     {
         cout << "You (X)  -  Computer (O)" << endl << endl;
     }
-    else if (gameType == 2)
+    else if (gameType == 2) // two player game
     {
         cout << playerOne << " (X) - " <<  playerTwo << " (O)" << endl << endl;
     }
@@ -205,17 +208,17 @@ bool onePlayerGame()
     {
         bool validChoice = false;
         print_board(1);
-            
+        
+        // prompts user to input a valid move choice (or to quit or restart)
         while (validChoice == false)
         {
             cout << "Please enter a number (or enter 'Q' to quit or 'N' to start a new game): ";
             getline(cin, choice);
             
-             
             if (choice == "Q")
             {
                 cout << "The game has ended because the user quit." << endl;
-                return true;
+                return true;    // ends game
             }
             
             if (choice == "N")
@@ -224,6 +227,7 @@ bool onePlayerGame()
                 return false;
             }
             
+            // if the choice is a number, convert it to an int
             if (choice.size() != 0 && isNumber(choice) == true)
             {
                 numberChoice = std::stoi(choice);
@@ -246,6 +250,7 @@ bool onePlayerGame()
                 }
                 else
                 {
+                    // update logs of choice history and the possible choices for the computer
                     validChoice = true;
                     choiceHistory.push_back(numberChoice);
                     auto find = std::find(cpuAllowedChoices.begin(), cpuAllowedChoices.end(), numberChoice);
@@ -259,8 +264,8 @@ bool onePlayerGame()
             }
         }
         
-        mark = 'X';
         // update square array according to player's move
+        mark = 'X';
         mark_square(numberChoice, mark);
         
         // check if game stops
@@ -277,6 +282,7 @@ bool onePlayerGame()
         if (cpuAllowedChoices.empty() == false && if_win == -1)
         {
             player *= -1;
+            // chooses random number out of the vector
             int cpuChoice = cpuAllowedChoices[rand() % cpuAllowedChoices.size()];
         
             choiceHistory.push_back(cpuChoice);
@@ -319,21 +325,22 @@ bool onePlayerGame()
 
 bool twoPlayerGame()
 {
-    std::vector<int> choiceHistory;
+    std::vector<int> choiceHistory; // log to avoid repeat choices
     
-    // print information to let users know they can exit by entering Q and restart by entering N
     int player = -1; // player = 1 or -1
-    int if_win = -1;
+    int if_win = -1; // start game with no winner (obviously)
     char mark;
     
-    string choice; // player's move
-    int numberChoice;
+    string choice; // player's move choice
+    int numberChoice;   // player's move choice converted to an integer
+    
     
     while (if_win == -1)
     {
         bool validChoice = false;
         print_board(2);
-            
+        
+        // cant exit until a valid choice is inputed
         while (validChoice == false)
         {
             if (player == -1)
@@ -419,8 +426,10 @@ bool twoPlayerGame()
             
     }  // end of turn
 
+    // print final board
     print_board(2);
     
+    // announce winner
     if (if_win==1)
     {
         cout<< "\nPlayer " << (-player+3)/2 << " wins! \n ";
