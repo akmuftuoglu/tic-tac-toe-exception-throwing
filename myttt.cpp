@@ -1,8 +1,9 @@
-
-
-
-
-
+/*
+PIC 10C Homework 6, myttt.cpp
+Purpose: Throwing expections for Tic-Tac-Toe
+Author: Aral Muftuoglu
+Date: 11/07/2022
+*/
 
 #include <iostream>
 #include <vector>
@@ -11,13 +12,18 @@ using namespace std;
 
 char square[10] = {'o','1','2','3','4','5','6','7','8','9'};
 int checkwin();
-void print_board();
+void print_board(int gameType);
 void mark_square(int choice, char mark);
 
 // helper functions
-bool onePlayerGame();   // will return false if game is restarted (game is not completed by will)
-//bool twoPlayerGame();   // will return false if game is restarted (game is not completed by will)
+bool onePlayerGame();   // both will return false if game is restarted (game is not completed by will)
+bool twoPlayerGame();   // will return true if game ends or the user quits
+
 bool isNumber(string x);
+void resetBoard();
+
+string playerOne;
+string playerTwo;
 
 int main()
 {
@@ -49,11 +55,29 @@ int main()
     
     if (gameType == "1")
     {
-        if (onePlayerGame() == false)
+        if (onePlayerGame() == false)   // when we enter this condition, it will still call the function, and then check if it is false
         {
+            resetBoard();
             return main();
         }
     }
+    
+    if (gameType == "2")
+    {
+        
+        cout << "Enter name for player 1: ";
+        getline(cin, playerOne);
+        
+        cout << "Enter name for player 2: ";
+        getline(cin, playerTwo);
+        
+        if (twoPlayerGame() == false)
+        {
+            resetBoard();
+            return main();
+        }
+    }
+    
     
     
     return 0;
@@ -97,10 +121,17 @@ int checkwin()
      FUNCTION TO DRAW BOARD OF TIC TAC TOE WITH PLAYER MARKS
 ********************************************************************/
 
-void print_board()
+void print_board(int gameType)
 {
     cout << "\n \t Tic Tac Toe \n";
-    cout << "Player 1 (X)  -  Player 2 (O)" << endl << endl;
+    if (gameType == 1)
+    {
+        cout << "You (X)  -  Computer (O)" << endl << endl;
+    }
+    else if (gameType == 2)
+    {
+        cout << playerOne << " (X) - " <<  playerTwo << " (O)" << endl << endl;
+    }
     cout << "     |     |     " << endl;
     cout << "  " << square[1] << "  |  " << square[2] << "  |  " << square[3] << endl;
     cout << "_____|_____|_____" << endl;
@@ -115,9 +146,6 @@ void print_board()
 // update the square array accoring to player's move
 void mark_square(int choice, char mark)
 {
-    
-    // if choice = 1, c = '1', ...
-    char c = '0'+choice;
     square[choice] = mark;
 }
 
@@ -135,14 +163,14 @@ bool onePlayerGame()
     int numberChoice;
     
     
-    while(if_win==-1)
+    while (if_win == -1)
     {
         bool validChoice = false;
-        print_board();
+        print_board(1);
             
         while (validChoice == false)
         {
-            cout << "Please enter a number (enter 'Q' to quit or 'N' to start a new game): ";
+            cout << "Please enter a number (or enter 'Q' to quit or 'N' to start a new game): ";
             getline(cin, choice);
             
              
@@ -170,7 +198,7 @@ bool onePlayerGame()
                 {
                     throw "You must input only one character with no spaces.";
                 }
-                else if (isNumber(choice) == false)
+                else if (isNumber(choice) == false || numberChoice == 0)
                 {
                     throw "You must input a number 1 to 9 (inclusive) to choose your move. Please try again.";
                 }
@@ -193,21 +221,21 @@ bool onePlayerGame()
             }
         }
         
-                          
         mark = 'X';
         // update square array according to player's move
         mark_square(numberChoice, mark);
         
         // check if game stops
         if_win = checkwin();
-        
         if (if_win == 1)
         {
             break;
         }
-    
+        
+        // cpu's turn
         mark = 'O';
         
+        // cpu should not have a turn if the user has won on their turn
         if (cpuAllowedChoices.empty() == false && if_win == -1)
         {
             player *= -1;
@@ -226,16 +254,16 @@ bool onePlayerGame()
     }
 
     
-    print_board();
+    print_board(1);
     
-    if (if_win==1)
+    if (if_win == 1)
         {
             if (player == -1)
             {
                 cout << "Congrats! You have won!" << endl;
                 return true;
             }
-            else
+            else // cpu player id is 1
             {
                 cout << "The CPU has won. You'll get them next time!" << endl;
                 return true;
@@ -250,39 +278,63 @@ bool onePlayerGame()
     return true;
 }
 
-/*
+
 bool twoPlayerGame()
 {
     std::vector<int> choiceHistory;
     
     // print information to let users know they can exit by entering Q and restart by entering N
     int player = -1; // player = 1 or -1
-    int if_win;
-    int choice; // player's move
+    int if_win = -1;
     char mark;
     
-    do
+    string choice; // player's move
+    int numberChoice;
+    
+    while (if_win == -1)
     {
         bool validChoice = false;
-        print_board();
+        print_board(2);
             
         while (validChoice == false)
         {
-            cout << "Player " << (player+3)/2 << ", enter a number (enter 'Q' to quit or 'N' to start a new game)";
-            cin >> choice;
+            if (player == -1)
+            {
+                cout << playerOne << ", enter a number (or enter 'Q' to quit or 'N' to start a new game): ";
+            }
+            else if (player == 1)
+            {
+                cout << playerTwo << ", enter a number (or enter 'Q' to quit or 'N' to start a new game): ";
+            }
+            getline(cin, choice);
+ 
+            if (choice == "Q")
+            {
+                cout << "The game has ended because the user quit." << endl;
+                return true;
+            }
+ 
+            if (choice == "N")
+            {
+                cout << "A new game has started." << endl;
+                return false;
+            }
+ 
+            if (choice.size() != 0 && isNumber(choice) == true)
+            {
+                numberChoice = std::stoi(choice);
+            }
                 
-            auto iter = std::find(choiceHistory.begin(), choiceHistory.end(), choice);
+            auto iter = std::find(choiceHistory.begin(), choiceHistory.end(), numberChoice);
             
             try {
-                if (cin.fail())
+                if (choice.size() != 1)
                 {
-                    cin.clear();
-                    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                    throw "You must input an integer. Please try again.";
+                    throw "You must input only one character with no spaces.";
                 }
-                else if (choice <= 0 || choice > 9)
+                else if (isNumber(choice) == false || numberChoice == 0)
                 {
-                    throw "You can only input a number 1 to 9 (inclusive) to choose your move. Please try again.";
+                    throw "You must input a number 1 to 9 (inclusive) to choose your move. Please try again.";
                 }
                 else if (iter != choiceHistory.end())
                 {
@@ -291,50 +343,58 @@ bool twoPlayerGame()
                 else
                 {
                     validChoice = true;
-                    choiceHistory.push_back(choice);
+                    choiceHistory.push_back(numberChoice);
                 }
             }
-                
+            
             catch (const char* errorMessage)
-                {
-                    cout << errorMessage << endl;
-                }
+            {
+                cout << errorMessage << endl;
             }
             
+        }   // end of getting a valid input
             
-            // select player's mark symbol
-            if (player == -1)
+            
+        // select player's mark symbol
+        if (player == -1)
+            {
                 mark = 'X';
-            else if (player == 1)
+            }
+        else if (player == 1)
+            {
                 mark = 'O';
+            }
             
-            // update square array according to player's move
-            mark_square(choice, mark);
+        // update square array according to player's move
+        mark_square(numberChoice, mark);
             
-            // check if game stops
-            if_win=checkwin();
+        // check if game stops
+        if_win = checkwin();
             
-            // change to next player's move
-            player *= -1;
-            
+        if (if_win == 1)
+        {
+            break;  // breaks from loop to announce winner before player changes
         }
-    while(if_win==-1);
-    
-    
-    print_board();
+            
+        // change to next player's move
+        player *= -1;
+            
+    }  // end of turn
+
+    print_board(2);
     
     if (if_win==1)
-        {
-            cout<< "\nPlayer " << (-player+3)/2 << " wins! \n ";
-        }
+    {
+        cout<< "\nPlayer " << (-player+3)/2 << " wins! \n ";
+    }
     else
-        {
-            cout<< "\nTie Game.\n";
-        }
+    {
+        cout<< "\nTie Game.\n";
+    }
     
     return true;
 }
-*/
+
 
 bool isNumber(string x)
 {
@@ -347,4 +407,13 @@ bool isNumber(string x)
     }
     
     return true;
+}
+
+void resetBoard()
+{
+    for (int i = 1; i < 10; i++)
+    {
+        char c = '0' + i;
+        square[i] = c;
+    }
 }
