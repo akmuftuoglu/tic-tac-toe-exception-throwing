@@ -64,12 +64,50 @@ int main()
     
     if (gameType == "2")
     {
+        bool validOne = false;
+        bool validTwo = false;
         
-        cout << "Enter name for player 1: ";
-        getline(cin, playerOne);
+        while (validOne == false)
+        {
+            cout << "Enter name for player 1: ";
+            getline(cin, playerOne);
         
-        cout << "Enter name for player 2: ";
-        getline(cin, playerTwo);
+            try {
+                if (playerOne.size() == 0)
+                {
+                    throw "You must enter a name. Please try again.";
+                }
+                else
+                {
+                    validOne = true;
+                }
+            }
+            catch (const char* errorMessage)
+            {
+                cout << errorMessage << endl;
+            }
+        }
+        
+        while (validTwo == false)
+        {
+            cout << "Enter name for player 2: ";
+            getline(cin, playerTwo);
+        
+            try {
+                if (playerTwo.size() == 0)
+                {
+                    throw "You must enter a name. Please try again.";
+                }
+                else
+                {
+                    validTwo = true;
+                }
+            }
+            catch (const char* errorMessage)
+            {
+                cout << errorMessage << endl;
+            }
+        }
         
         if (twoPlayerGame() == false)
         {
